@@ -1,3 +1,9 @@
+<?php
+    session_start();
+
+    if ($_SESSION["role_id"] == 1 || $_SESSION["role_id"] == 2 || $_SESSION["role_id"] == 3 ) {
+?>
+
 <!DOCTYPE html>
 <!--
 Template Name: Cooban
@@ -18,10 +24,10 @@ Licence URI: http://www.os-templates.com/template-terms
 <!-- ################################################################################################ -->
 <!-- ################################################################################################ -->
 <!-- Top Background Image Wrapper -->
-<div class="wrapper bgded overlay" style="background-image:url('images/demo/backgrounds/01.png');"> 
+<div class="wrapper bgded overlay" style="background-image:url('images/demo/backgrounds/01.png');">
   <!-- ################################################################################################ -->
   <div class="row1">
-    <header id="header" class="hoc clear"> 
+    <header id="header" class="hoc clear">
       <!-- ################################################################################################ -->
       <div id="logo" class="fl_left">
         <h1><a href="index.html">Cooban</a></h1>
@@ -29,14 +35,42 @@ Licence URI: http://www.os-templates.com/template-terms
       <nav id="mainav" class="fl_right">
         <ul class="clear">
           <li><a href="index.php">Home</a></li>
-          <li class="active"><a class="drop" href="#">Voorraden</a>
-            <ul>
-              <li><a href="voorraad.php">Voorraden</a></li>
-              <li><a href="producten.php">Producten</a></li>
-            </ul>
-          </li>
-          <li><a href="locaties.php">Locaties</a></li>
-          <li><a href="gebruikers.php">Gebruikers</a></li>
+          <?php
+
+              require("classes/Database.class.php");
+
+              if (isset($_SESSION["logged_in"])) {
+                  if(isset($_SESSION["role_id"])) {
+
+                      $db = new Database("localhost","gebruikersrollen","root","");
+                      $sql = "SELECT * FROM rights WHERE role_id=".$_SESSION["role_id"];
+                      $result = $db->ReadDataAll($sql);
+
+                      foreach ($result as $key => $value) {
+                          if ($value["section_id"] == 1) {
+                              echo  '<li><a class="drop" href="#">Voorraden</a>';
+                              echo  '<ul>';
+                              echo  '<li><a href="voorraad.php">Voorraden</a></li>';
+                              echo  '<li><a href="producten.php">Producten</a></li>';
+                              echo  '</ul>';
+                              echo  '</li>';
+                          } else if ($value["section_id"] == 3) {
+                              echo '<li><a href="locaties.php">Locaties</a></li>';
+                          } else if ($value["section_id"] == 4) {
+                              echo '<li><a href="gebruikers.php">Gebruikers</a></li>';
+                          }
+                      }
+                  }
+              }
+
+          ?>
+          <?php
+              if (!isset($_SESSION["logged_in"])) {
+                  echo "<li><a href='login.php'>Log in</a></li>";
+              } else {
+                  echo "<li><a href='logout.php'>Logout</a></li>";
+              }
+          ?>
         </ul>
       </nav>
       <!-- ################################################################################################ -->
@@ -45,7 +79,7 @@ Licence URI: http://www.os-templates.com/template-terms
   <!-- ################################################################################################ -->
   <!-- ################################################################################################ -->
   <!-- ################################################################################################ -->
-  <div id="breadcrumb" class="hoc clear"> 
+  <div id="breadcrumb" class="hoc clear">
     <!-- ################################################################################################ -->
     <!-- ################################################################################################ -->
   </div>
@@ -56,10 +90,10 @@ Licence URI: http://www.os-templates.com/template-terms
 <!-- ################################################################################################ -->
 <!-- ################################################################################################ -->
 <div class="wrapper row3">
-  <main class="hoc container clear"> 
+  <main class="hoc container clear">
     <!-- main body -->
     <!-- ################################################################################################ -->
-    <div class="content"> 
+    <div class="content">
       <!-- ################################################################################################ -->
       <h1>Producten</h1>
       <div class="scrollable">
@@ -99,7 +133,7 @@ Licence URI: http://www.os-templates.com/template-terms
 <!-- ################################################################################################ -->
 <!-- ################################################################################################ -->
 <div class="wrapper row5">
-  <div id="copyright" class="hoc clear"> 
+  <div id="copyright" class="hoc clear">
     <!-- ################################################################################################ -->
     <p class="fl_left">Copyright &copy; 2015 - All Rights Reserved - <a href="#">Domain Name</a></p>
     <p class="fl_right">Template by <a target="_blank" href="http://www.os-templates.com/" title="Free Website Templates">OS Templates</a></p>
@@ -119,3 +153,9 @@ Licence URI: http://www.os-templates.com/template-terms
 <!-- / IE9 Placeholder Support -->
 </body>
 </html>
+
+<?php
+    } else {
+        header("Location: index.php");
+    }
+?>

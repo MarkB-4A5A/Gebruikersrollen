@@ -1,9 +1,10 @@
 <?php
     session_start();
 
-    if ($_SESSION["role_id"] != 4) {
-       header("Location: index.php");
+    if(isset($_SESSION["logged_in"])) {
+        header("Location: index.php");
     }
+
 ?>
 
 <!DOCTYPE html>
@@ -37,19 +38,38 @@ Licence URI: http://www.os-templates.com/template-terms
       <nav id="mainav" class="fl_right">
         <ul class="clear">
           <li><a href="index.php">Home</a></li>
-          <li><a class="drop" href="#">Voorraden</a>
-            <ul>
-              <li><a href="voorraad.php">Voorraden</a></li>
-              <li><a href="producten.php">Producten</a></li>
-            </ul>
-          </li>
-          <li><a href="locaties.php">Locaties</a></li>
-          <li class="active"><a href="gebruikers.php">Gebruikers</a></li>
+          <?php
+
+              require("classes/Database.class.php");
+
+              if (isset($_SESSION["logged_in"])) {
+                  if(isset($_SESSION["role_id"])) {
+
+                      $db = new Database("localhost","gebruikersrollen","root","");
+                      $sql = "SELECT * FROM rights WHERE role_id=".$_SESSION["role_id"];
+                      $result = $db->ReadDataAll($sql);
+
+                      foreach ($result as $key => $value) {
+                          if ($value["section_id"] == 1) {
+                              echo  '<li><a class="drop" href="#">Voorraden</a>';
+                              echo  '<ul>';
+                              echo  '<li><a href="voorraad.php">Voorraden</a></li>';
+                              echo  '<li><a href="producten.php">Producten</a></li>';
+                              echo  '</ul>';
+                              echo  '</li>';
+                          } else if ($value["section_id"] == 3) {
+                              echo '<li><a href="locaties.php">Locaties</a></li>';
+                          } else if ($value["section_id"] == 4) {
+                              echo '<li><a href="gebruikers.php">Gebruikers</a></li>';
+                          }
+                      }
+                  }
+              }
+
+          ?>
           <?php
               if (!isset($_SESSION["logged_in"])) {
-                  echo "<li><a href='login.php'>Log in</a></li>";
-              } else {
-                  echo "<li><a href='logout.php'>Logout</a></li>";
+                  echo "<li class='active'><a href='login.php'>Log in</a></li>";
               }
           ?>
         </ul>
@@ -76,30 +96,16 @@ Licence URI: http://www.os-templates.com/template-terms
     <!-- ################################################################################################ -->
     <div class="content">
       <!-- ################################################################################################ -->
-      <h1>Gebruikers</h1>
-      <div class="scrollable">
-        <table>
-          <thead>
-            <tr>
-              <th>Rol</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Voorraadbeheerder</td>
-            </tr>
-            <tr>
-              <td>Accountmanager</td>
-            </tr>
-            <tr>
-              <td>Manager</td>
-            </tr>
-            <tr>
-              <td>Systeembeheerder</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <h1>Login</h1>
+      <p>Please log in using your username and password</p>
+
+      <form method="post" action="processlogin.php">
+          <input type="text" name="admin_name">
+          <input type="password" name="admin_password">
+          <input type="submit" name="admin_login" value="Log in">
+      </form>
+
+
       <!-- ################################################################################################ -->
     </div>
     <!-- ################################################################################################ -->
@@ -110,6 +116,48 @@ Licence URI: http://www.os-templates.com/template-terms
 <!-- ################################################################################################ -->
 <!-- ################################################################################################ -->
 <!-- ################################################################################################ -->
+<div class="wrapper row4">
+  <footer id="footer" class="hoc clear">
+    <!-- ################################################################################################ -->
+    <div class="one_quarter first">
+      <h6 class="title">Phasellus aenean</h6>
+      <address class="btmspace-15">
+      Company Name<br>
+      Street Name &amp; Number<br>
+      Town<br>
+      Postcode/Zip
+      </address>
+      <ul class="nospace">
+        <li><i class="fa fa-phone"></i> +00 (123) 456 7890</li>
+        <li><i class="fa fa-envelope-o"></i> info@domain.com</li>
+      </ul>
+    </div>
+    <div class="one_quarter">
+      <h6 class="title">Imperdiet aliquam</h6>
+      <article>
+        <h2 class="nospace font-x1"><a href="#">Neque porta elit</a></h2>
+        <time class="font-xs" datetime="2045-04-06">Friday, 6<sup>th</sup> April 2045</time>
+        <p>Dignissim tellus vitae posuere laoreet dui nulla pulvinar dolor at ultricies lectus orci aliquam ipsum vestibulum at.</p>
+      </article>
+    </div>
+    <div class="one_quarter">
+      <h6 class="title">Iaculis mauris</h6>
+      <ul class="nospace linklist">
+        <li><a href="#">Consectetur commodo orci</a></li>
+        <li><a href="#">Vitae tempus maecenas</a></li>
+        <li><a href="#">Feugiat eget nisi vel</a></li>
+        <li><a href="#">Scelerisque fusce suscipit</a></li>
+        <li><a href="#">At sodales facilisis vivamus</a></li>
+      </ul>
+    </div>
+    <div class="one_quarter">
+      <h6 class="title">Quis auctor nulla</h6>
+      <p>Risus vivamus consectetur neque augue eu tincidunt urna varius nec phasellus.</p>
+      <p>Dapibus rutrum interdum nullam commodo lacus sed neque porttitor.</p>
+    </div>
+    <!-- ################################################################################################ -->
+  </footer>
+</div>
 <!-- ################################################################################################ -->
 <!-- ################################################################################################ -->
 <!-- ################################################################################################ -->
